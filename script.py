@@ -1,18 +1,19 @@
 import time
 import requests
 
+# Getting information from files
 tokens = []
+proxies = []
 with open("tokens.txt", "r") as f:
     for x in f.readlines():
         tokens.append(x.strip())
-
-proxies = []
 with open("proxies.txt", "r") as f:
     for x in f.readlines():
         proxies.append(x)
 
 
-def send_message(tkn: str, proxy: str, channel_id: str, msg: str):
+# Function to send message from user
+def send_message(tkn: str, channel_id: str, msg: str, proxy=""):
     headers = {"accept": "*/*",
                "accept-encoding": "gzip, deflate",
                "accept-language": "en-US",
@@ -37,18 +38,28 @@ def send_message(tkn: str, proxy: str, channel_id: str, msg: str):
                                  json=content)
         answer = response.json()
         print(answer["author"]["username"] + " sent message " + answer["content"] + " successfully")
-    p = {'http': proxy,
-         "https": proxy}
-    response = requests.post(url=url,
-                             headers=headers,
-                             json=content,
-                             proxies=p)
-    answer = response.json()
-    print(answer["author"]["username"] + " sent message " + answer["content"] + " successfully")
+    else:
+        p = {'http': proxy,
+             "https": proxy}
+        response = requests.post(url=url,
+                                 headers=headers,
+                                 json=content,
+                                 proxies=p)
+        answer = response.json()
+        print(answer["author"]["username"] + " sent message " + answer["content"] + " successfully")
 
 
-channelId = "1060736059215970345"  # сюда вписывать id канала, куда сообщения идут
-while True:
-    for i in range(len(tokens)):
-        send_message(tokens[i], proxies[i % len(proxies)], channelId, "!work")
-    time.sleep(60 * 60 + 5)
+channelId = "1060736059215970345"  # channel id
+delay = 3605  # delay in seconds
+
+
+# Here you can write your own code
+def main():
+    while True:
+        for i in range(len(tokens)):
+            send_message(tokens[i], channelId, "!work", proxy=proxies[i % len(proxies) - 1])
+        time.sleep(delay)
+
+
+if __name__ == "__main__":
+    main()
